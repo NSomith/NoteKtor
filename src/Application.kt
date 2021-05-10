@@ -1,6 +1,6 @@
 package com.example
 
-import com.example.data.checkPassword
+import com.example.data.checkPasswordForEmail
 import com.example.data.collections.User
 import com.example.data.registerUser
 import com.example.route.loginRoute
@@ -26,30 +26,30 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) {
     install(DefaultHeaders)
     install(CallLogging)
-    install(ContentNegotiation){
+    install(ContentNegotiation) {
         gson {
-            setPrettyPrinting() //for getting the resposen in json
+            setPrettyPrinting()
         }
     }
-    install(Authentication){
-        configuration()
+    install(Authentication) {
+        configureAuth()
     }
-    install(Routing){
+    install(Routing) {
         registerRoute()
         loginRoute()
         noteRoutes()
     }
 }
 
-fun Authentication.Configuration.configuration(){
+private fun Authentication.Configuration.configureAuth() {
     basic {
         realm = "Note Server"
-        validate {credentials->
+        validate { credentials ->
             val email = credentials.name
             val password = credentials.password
-            if(checkPassword(email,password)){
+            if(checkPasswordForEmail(email, password)) {
                 UserIdPrincipal(email)
-            }else null
+            } else null
         }
     }
 }
